@@ -19,3 +19,7 @@ Lampp stack made up with docker-compose
 
  ### Instruction 
  This project is created to handle the web development tasks on local.
+
+ [![File Sharing - Docker](usage/file-sharing-docker.png)](https://docs.docker.com/desktop/synchronized-file-sharing/)
+
+ 
