@@ -12,6 +12,7 @@ services:
       - ./nginx:/etc/nginx/conf.d
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
+      - ./playground:/var/www/playground
     networks:
       - lamp_network
     depends_on:
@@ -26,6 +27,7 @@ services:
     volumes:
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
+      - ./playground:/var/www/playground
     networks:
       - lamp_network
     healthcheck:
