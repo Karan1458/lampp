@@ -7,13 +7,18 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Absolute paths for commands
+CAT="/bin/cat"
+TEE="/usr/bin/tee"
+SUDO="/usr/bin/sudo"
+
 # Function to install Docker CE
 install_docker_ce() {
     # Update the apt package index
-    sudo apt-get update
+    $SUDO apt-get update
 
     # Install packages to allow apt to use a repository over HTTPS
-    sudo apt-get install -y \
+    $SUDO apt-get install -y \
         apt-transport-https \
         ca-certificates \
         curl \
@@ -21,26 +26,26 @@ install_docker_ce() {
         software-properties-common
 
     # Add Docker's official GPG key
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO apt-key add -
 
     # Set up the stable repository
-    sudo add-apt-repository \
+    $SUDO add-apt-repository \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
     # Update the apt package index
-    sudo apt-get update
+    $SUDO apt-get update
 
     # Install Docker CE
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    $SUDO apt-get install -y docker-ce docker-ce-cli containerd.io
 }
 
 # Function to install Docker Compose
 install_docker_compose() {
     # Download the current stable release of Docker Compose
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    $SUDO curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
     # Apply executable permissions to the Docker Compose binary
-    sudo chmod +x /usr/local/bin/docker-compose
+    $SUDO chmod +x /usr/local/bin/docker-compose
 }
 
 # Function to install Docker and Docker Compose if not installed
@@ -66,7 +71,7 @@ install_docker_and_compose() {
 update_hosts_file() {
     DOMAIN=$1
     # Add .test domain entry to /etc/hosts file
-    echo "127.0.0.1   $DOMAIN.test" | sudo tee -a /etc/hosts >/dev/null
+    echo "127.0.0.1   $DOMAIN.test" | $SUDO $TEE -a /etc/hosts >/dev/null
 }
 
 # Function to add site configuration for Nginx
@@ -75,7 +80,7 @@ add_site() {
     PATH=$2
 
     # Create nginx configuration file
-    cat << EOF > nginx/$DOMAIN.conf
+    $SUDO $CAT << EOF > nginx/$DOMAIN.conf
 server {
     listen 80;
     server_name $DOMAIN.test;
@@ -114,7 +119,7 @@ remove_site() {
     rm -f nginx/sites/$DOMAIN.conf
 
     # Remove .test domain entry from /etc/hosts file
-    sudo sed -i "/$DOMAIN.test/d" /etc/hosts
+    $SUDO sed -i "/$DOMAIN.test/d" /etc/hosts
 
     echo "Site configuration removed for $DOMAIN"
 }
@@ -131,8 +136,8 @@ start_containers() {
         #git clone --depth 1 --branch $(git ls-remote --tags --sort="v:refname" --refs https://github.com/phpmyadmin/phpmyadmin.git | tail -n 1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+') https://github.com/phpmyadmin/phpmyadmin.git phpmyadmin
 
         # Update /etc/hosts file
-        update_hosts_file 'phpmyadmin.test'
-        update_hosts_file 'playground.test'
+        update_hosts_file "phpmyadmin"
+        update_hosts_file "playground"
 
         # Clone another repository
         git clone https://github.com/Karan1458/playground.git playground

@@ -1,2 +1,10 @@
 phpmyadmin
 playground
+
+# Ignore everything in the nginx folder
+nginx/*
+
+# Except for default files
+!nginx/default.conf
+!nginx/playground.conf
+!nginx/phpmyadmin.conf
