@@ -10,6 +10,7 @@ command_exists() {
 # Absolute paths for commands
 CAT="/bin/cat"
 TEE="/usr/bin/tee"
+SED="/usr/bin/sed"
 SUDO="/usr/bin/sudo"
 
 # Function to install Docker CE
@@ -80,23 +81,24 @@ add_site() {
     PATH=$2
 
     # Create nginx configuration file
-    $SUDO $CAT << EOF > nginx/$DOMAIN.conf
+    $SUDO $CAT << 'EOF' > nginx/$DOMAIN.conf
 server {
     listen 80;
     server_name $DOMAIN.test;
     root /var/www/$PATH;
 
-    index index.php index.html index.htm;
-
     location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
+        index index.php index.html index.htm;
+        try_files $uri $uri/ /index.php?$query_string;
     }
 
     location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
+        try_files $uri =404;
         fastcgi_pass php:9000;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include fastcgi_params;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
     }
 
     location ~ /\.ht {
@@ -104,6 +106,8 @@ server {
     }
 }
 EOF
+    # Replace $uri, $DOMAIN, and $PATH in nginx config
+    $SED -i "s|\$DOMAIN|$DOMAIN|g; s|\$PATH|$PATH|g" "nginx/$DOMAIN.conf"
 
     # Update /etc/hosts file
     update_hosts_file $DOMAIN
@@ -135,7 +139,14 @@ start_containers() {
         #./clone-latest-tag.sh https://github.com/phpmyadmin/phpmyadmin.git
         URL="https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-english.tar.gz";
         DEST_FOLDER="phpmyadmin"
-        mkdir -p "$DEST_FOLDER"; wget -qO- "$URL" | tar -xzvf- -C "$DEST_FOLDER" --strip-components=1
+        HOST='mysql'
+        mkdir -p "$DEST_FOLDER"; wget -qO- "$URL" | tar -xzf- -C "$DEST_FOLDER" --strip-components=1
+
+        # Copy config.sample.inc.php to config.inc.php
+        cp "$DEST_FOLDER/config.sample.inc.php" "$DEST_FOLDER/config.inc.php"
+
+        # Update host value in config.inc.php
+        sed -i "s/\(\$cfg\['Servers'\]\[\$i\]\['host'\] = '\)[^']*'/\1$HOST'/g" "$DEST_FOLDER/config.inc.php"
         #git clone --depth 1 --branch $(git ls-remote --tags --sort="v:refname" --refs https://github.com/phpmyadmin/phpmyadmin.git | tail -n 1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+') https://github.com/phpmyadmin/phpmyadmin.git phpmyadmin
 
         # Update /etc/hosts file

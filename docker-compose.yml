@@ -13,6 +13,7 @@ services:
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
       - ./playground:/var/www/playground
+      - ./projects:/var/www/projects
     networks:
       - lamp_network
     depends_on:
@@ -28,6 +29,7 @@ services:
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
       - ./playground:/var/www/playground
+      - ./projects:/var/www/projects
     networks:
       - lamp_network
     healthcheck:
