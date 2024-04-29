@@ -84,7 +84,7 @@ add_site() {
 server {
     listen 80;
     server_name $DOMAIN.test;
-    root /var/www/html/$PATH;
+    root /var/www/$PATH;
 
     index index.php index.html index.htm;
 
@@ -132,7 +132,10 @@ start_containers() {
     # Check if the argument is "build-start"
     if [ "$1" == "build-start" ]; then
         # Clone latest tag of phpMyAdmin repository
-        ./clone-latest-tag.sh https://github.com/phpmyadmin/phpmyadmin.git
+        #./clone-latest-tag.sh https://github.com/phpmyadmin/phpmyadmin.git
+        URL="https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-english.tar.gz";
+        DEST_FOLDER="phpmyadmin"
+        mkdir -p "$DEST_FOLDER"; wget -qO- "$URL" | tar -xzvf- -C "$DEST_FOLDER" --strip-components=1
         #git clone --depth 1 --branch $(git ls-remote --tags --sort="v:refname" --refs https://github.com/phpmyadmin/phpmyadmin.git | tail -n 1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+') https://github.com/phpmyadmin/phpmyadmin.git phpmyadmin
 
         # Update /etc/hosts file
@@ -169,6 +172,10 @@ destroy_all() {
 
         # Remote playground folder
         rm -rf playground
+
+        # Remove .test domain entry from /etc/hosts file
+        $SUDO sed -i "/playground.test/d" /etc/hosts
+        $SUDO sed -i "/phpmyadmin.test/d" /etc/hosts
     else
         echo "Destroy cancelled."
     fi
