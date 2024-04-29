@@ -1,6 +1,6 @@
 # LAMPP Stack - Docker Compose
 
-Lampp stack made up with docker-compose
+Lampp stack made up with docker-compose. This project is created to handle the web development tasks on local.
 
 ### Things to Do
 
@@ -16,9 +16,11 @@ Lampp stack made up with docker-compose
  - `./setup.sh start` - For starting docker images
  - `./setup.sh stop` - For stopping docker images
  - `./setup.sh destroy` - Removing all images and data
+ - `./setup.sh add-site domain path` - Valid mount point can become domain. ( domain without any tld )
+ - `./setup.sh remove-site domain` - removing the domain and it's config file ( domain without any tld )
 
  ### Instruction 
- This project is created to handle the web development tasks on local.
+ Make sure to enable file sharing for the required directorys. 
 
  [![File Sharing - Docker](usage/file-sharing-docker.png)](https://docs.docker.com/desktop/synchronized-file-sharing/)
 
