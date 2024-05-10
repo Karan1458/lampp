@@ -70,6 +70,15 @@ services:
     networks:
       - lamp_network
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: lamp_mailhog
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
+    networks:
+      - lamp_network
+
 volumes:
   mysql_data:
 

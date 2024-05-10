@@ -152,6 +152,7 @@ start_containers() {
         # Update /etc/hosts file
         update_hosts_file "phpmyadmin"
         update_hosts_file "playground"
+        update_hosts_file "mailhog"
 
         # Clone another repository
         git clone https://github.com/Karan1458/playground.git playground
@@ -187,6 +188,8 @@ destroy_all() {
         # Remove .test domain entry from /etc/hosts file
         $SUDO sed -i "/playground.test/d" /etc/hosts
         $SUDO sed -i "/phpmyadmin.test/d" /etc/hosts
+        $SUDO sed -i "/mailhog.test/d" /etc/hosts
+
     else
         echo "Destroy cancelled."
     fi
