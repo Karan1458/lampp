@@ -9,7 +9,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/conf.d
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
       - ./playground:/var/www/playground
@@ -26,6 +27,7 @@ services:
     container_name: lamp_php
     restart: unless-stopped
     volumes:
+      - ./php/php.ini:/usr/local/etc/php/php.ini:ro
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin
       - ./playground:/var/www/playground

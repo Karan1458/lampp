@@ -81,7 +81,7 @@ add_site() {
     PATH=$2
 
     # Create nginx configuration file
-    $SUDO $CAT << 'EOF' > nginx/$DOMAIN.conf
+    $SUDO $CAT << 'EOF' > nginx/sites/$DOMAIN.conf
 server {
     listen 80;
     server_name $DOMAIN.test;
@@ -107,7 +107,7 @@ server {
 }
 EOF
     # Replace $uri, $DOMAIN, and $PATH in nginx config
-    $SED -i "s|\$DOMAIN|$DOMAIN|g; s|\$PATH|$PATH|g" "nginx/$DOMAIN.conf"
+    $SED -i "s|\$DOMAIN|$DOMAIN|g; s|\$PATH|$PATH|g" "nginx/sites/$DOMAIN.conf"
 
     # Update /etc/hosts file
     update_hosts_file $DOMAIN
