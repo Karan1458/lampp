@@ -8,3 +8,6 @@ nginx/sites/*
 !nginx/sites/default.conf
 !nginx/sites/playground.conf
 !nginx/sites/phpmyadmin.conf
+
+projects
+website

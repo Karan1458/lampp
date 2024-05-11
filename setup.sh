@@ -12,6 +12,7 @@ CAT="/bin/cat"
 TEE="/usr/bin/tee"
 SED="/usr/bin/sed"
 SUDO="/usr/bin/sudo"
+GREP="/usr/bin/grep"
 
 # Function to install Docker CE
 install_docker_ce() {
@@ -71,8 +72,18 @@ install_docker_and_compose() {
 # Function to update /etc/hosts file
 update_hosts_file() {
     DOMAIN=$1
-    # Add .test domain entry to /etc/hosts file
-    echo "127.0.0.1   $DOMAIN.test" | $SUDO $TEE -a /etc/hosts >/dev/null
+
+    # Define the IP address and hostname
+    IP_ADDRESS="127.0.0.1"
+
+    # Check if the entry already exists in /etc/hosts
+    if $SUDO $SED -n "/^$IP_ADDRESS[[:space:]]\+$DOMAIN.test\$/p" /etc/hosts >/dev/null; then
+        echo "Entry already exists in /etc/hosts. Skipping..."
+    else
+        # Add .test domain entry to /etc/hosts file
+        echo "$IP_ADDRESS $DOMAIN.test" | $SUDO $TEE -a /etc/hosts >/dev/null
+        echo "Entry added to /etc/hosts."
+    fi
 }
 
 # Function to add site configuration for Nginx
@@ -80,15 +91,20 @@ add_site() {
     DOMAIN=$1
     PATH=$2
 
-    # Create nginx configuration file
-    $SUDO $CAT << 'EOF' > nginx/sites/$DOMAIN.conf
+    # Check if the Nginx site configuration file already exists
+    if [ -e "nginx/sites/$DOMAIN.conf" ]; then
+        echo "Nginx site configuration file already exists. Skipping..."
+    else
+        # Create nginx configuration file
+        $SUDO $CAT << 'EOF' > nginx/sites/$DOMAIN.conf
 server {
     listen 80;
     server_name $DOMAIN.test;
     root /var/www/$PATH;
 
+    index index.php index.html index.htm;
+
     location / {
-        index index.php index.html index.htm;
         try_files $uri $uri/ /index.php?$query_string;
     }
 
@@ -101,13 +117,20 @@ server {
         fastcgi_param PATH_INFO $fastcgi_path_info;
     }
 
+    # Cache Static files
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+    }
+
     location ~ /\.ht {
         deny all;
     }
 }
 EOF
-    # Replace $uri, $DOMAIN, and $PATH in nginx config
-    $SED -i "s|\$DOMAIN|$DOMAIN|g; s|\$PATH|$PATH|g" "nginx/sites/$DOMAIN.conf"
+        # Replace $uri, $DOMAIN, and $PATH in nginx config
+        $SED -i "s|\$DOMAIN|$DOMAIN|g; s|\$PATH|$PATH|g" "nginx/sites/$DOMAIN.conf"
+    fi
 
     # Update /etc/hosts file
     update_hosts_file $DOMAIN
