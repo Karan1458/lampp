@@ -158,27 +158,37 @@ start_containers() {
 
     # Check if the argument is "build-start"
     if [ "$1" == "build-start" ]; then
-        # Clone latest tag of phpMyAdmin repository
-        #./clone-latest-tag.sh https://github.com/phpmyadmin/phpmyadmin.git
-        URL="https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-english.tar.gz";
-        DEST_FOLDER="phpmyadmin"
-        HOST='mysql'
-        mkdir -p "$DEST_FOLDER"; wget -qO- "$URL" | tar -xzf- -C "$DEST_FOLDER" --strip-components=1
+        # Check if phpMyAdmin folder exists
+        if [ -d "./phpmyadmin" ]; then
+            echo "PHPmyAdmin folder already exists. Skipping..."
+        else
+            # Clone latest tag of phpMyAdmin repository
+            #./clone-latest-tag.sh https://github.com/phpmyadmin/phpmyadmin.git
+            URL="https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-english.tar.gz";
+            DEST_FOLDER="phpmyadmin"
+            HOST='mysql'
+            mkdir -p "$DEST_FOLDER"; wget -qO- "$URL" | tar -xzf- -C "$DEST_FOLDER" --strip-components=1
 
-        # Copy config.sample.inc.php to config.inc.php
-        cp "$DEST_FOLDER/config.sample.inc.php" "$DEST_FOLDER/config.inc.php"
+            # Copy config.sample.inc.php to config.inc.php
+            cp "$DEST_FOLDER/config.sample.inc.php" "$DEST_FOLDER/config.inc.php"
 
-        # Update host value in config.inc.php
-        sed -i "s/\(\$cfg\['Servers'\]\[\$i\]\['host'\] = '\)[^']*'/\1$HOST'/g" "$DEST_FOLDER/config.inc.php"
-        #git clone --depth 1 --branch $(git ls-remote --tags --sort="v:refname" --refs https://github.com/phpmyadmin/phpmyadmin.git | tail -n 1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+') https://github.com/phpmyadmin/phpmyadmin.git phpmyadmin
+            # Update host value in config.inc.php
+            sed -i "s/\(\$cfg\['Servers'\]\[\$i\]\['host'\] = '\)[^']*'/\1$HOST'/g" "$DEST_FOLDER/config.inc.php"
+            #git clone --depth 1 --branch $(git ls-remote --tags --sort="v:refname" --refs https://github.com/phpmyadmin/phpmyadmin.git | tail -n 1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+') https://github.com/phpmyadmin/phpmyadmin.git phpmyadmin
+        fi
+
+        # Check if phpMyAdmin folder exists
+        if [ -d "./playground" ]; then
+            echo "PHP Playground folder already exists. Skipping..."
+        else
+             # Clone another repository
+            git clone https://github.com/Karan1458/playground.git playground
+        fi
 
         # Update /etc/hosts file
         update_hosts_file "phpmyadmin"
         update_hosts_file "playground"
         update_hosts_file "mailhog"
-
-        # Clone another repository
-        git clone https://github.com/Karan1458/playground.git playground
 
         # Start docker-compose
         docker-compose up --build -d
