@@ -13,6 +13,7 @@ TEE="/usr/bin/tee"
 SED="/usr/bin/sed"
 SUDO="/usr/bin/sudo"
 GREP="/usr/bin/grep"
+AWK="/usr/bin/awk"
 
 # Function to install Docker CE
 install_docker_ce() {
@@ -77,6 +78,7 @@ update_hosts_file() {
     IP_ADDRESS="127.0.0.1"
 
     # Check if the entry already exists in /etc/hosts
+    #if grep -qFx "$IP_ADDRESS $DOMAIN.test" /etc/hosts; then
     if $SUDO $SED -n "/^$IP_ADDRESS[[:space:]]\+$DOMAIN.test\$/p" /etc/hosts >/dev/null; then
         echo "Entry already exists in /etc/hosts. Skipping..."
     else
