@@ -28,7 +28,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./php/php.ini:/usr/local/etc/php/php.ini:ro
-      - ./php/fix_permissions.sh:/var/www/html/fix_permissions.sh:ro
       - ./website:/var/www/html
       - ./phpmyadmin:/var/www/phpmyadmin:ro
       - ./playground:/var/www/playground
