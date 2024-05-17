@@ -24,6 +24,10 @@ services:
   php:
     build:
       context: ./php
+      args:
+        user: ${HOST_USER}
+        UID: ${HOST_UID}
+        GID: ${HOST_GID}
     container_name: lamp_php
     restart: unless-stopped
     volumes:

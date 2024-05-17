@@ -15,6 +15,11 @@ SUDO="/usr/bin/sudo"
 GREP="/usr/bin/grep"
 AWK="/usr/bin/awk"
 
+# Get your host's UID and GID
+export HOST_UID=$(id -u)
+export HOST_GID=$(id -g)
+export HOST_USER=$(whoami)
+
 # Function to install Docker CE
 install_docker_ce() {
     # Update the apt package index
