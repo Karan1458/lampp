@@ -36,7 +36,6 @@ services:
       - ./phpmyadmin:/var/www/phpmyadmin:ro
       - ./playground:/var/www/playground
       - ./projects:/var/www/projects
-    user: "www-data:www-data"
     networks:
       - lamp_network
     healthcheck:

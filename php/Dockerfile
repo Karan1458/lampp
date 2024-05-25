@@ -15,6 +15,9 @@ RUN docker-php-ext-configure intl && docker-php-ext-install intl
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 
+#Install mhSendmail
+COPY --from=tkotosz/mhsendmail:0.2.0 /usr/bin/mhsendmail /usr/local/bin/
+
 
 # Remove if exists 
 RUN if getent passwd ${UID} >/dev/null; then \
@@ -36,24 +39,21 @@ RUN addgroup ${user} root
 RUN mkdir -p /home/${user}/.composer & \
     chown -R ${user}:${user} /home/${user}
 
-
-
-
-
 # Set the correct permissions
-COPY fix-permissions.sh /home/${user}/scripts/fix-permissions.sh
-RUN chmod +x /home/${user}/scripts/fix-permissions.sh
+#COPY fix-permissions.sh /home/${user}/scripts/fix-permissions.sh
+#RUN chmod +x /home/${user}/scripts/fix-permissions.sh
+#RUN /home/${user}/scripts/fix-permissions.sh
 
 
 # Set the user
-USER $user
+#USER $user
 
 
 # Set working directory
 WORKDIR /var/www/html
 
 #CMD ["/home/${user}/scripts/fix-permissions.sh"]
-
+CMD ["/usr/local/sbin/php-fpm", "--allow-to-run-as-root"]
 
 #ENTRYPOINT ["su-exec", "nobody", "/usr/local/sbin/php-fpm", "--nodaemonize", "--force-stderr"]
 
