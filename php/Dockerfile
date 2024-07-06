@@ -8,7 +8,7 @@ ARG GID
 
 # Install PHP extensions
 RUN apk add --no-cache icu-dev libzip-dev zip libpng-dev gmp-dev su-exec
-RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath gmp gd
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath gmp gd exif
 RUN docker-php-ext-configure intl && docker-php-ext-install intl
 
 # Install Composer
