@@ -7,9 +7,14 @@ ARG UID
 ARG GID
 
 # Install PHP extensions
-RUN apk add --no-cache icu-dev libzip-dev zip libpng-dev gmp-dev su-exec
+RUN apk add --no-cache autoconf libtool make icu-dev libzip-dev zip libpng-dev gmp-dev su-exec
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath gmp gd exif
 RUN docker-php-ext-configure intl && docker-php-ext-install intl
+#RUN docker-php-ext-configure gd --with-jpeg && \docker-php-ext-install gd
+RUN docker-php-ext-configure pcntl --enable-pcntl \
+    && docker-php-ext-install pcntl
+
+    
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

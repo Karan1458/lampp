@@ -78,13 +78,13 @@ install_docker_and_compose() {
 # Function to update /etc/hosts file
 update_hosts_file() {
     DOMAIN=$1
-
+    echo "Check $DOMAIN in hosts file"
     # Define the IP address and hostname
     IP_ADDRESS="127.0.0.1"
 
     # Check if the entry already exists in /etc/hosts
     #if grep -qFx "$IP_ADDRESS $DOMAIN.test" /etc/hosts; then
-    if $SUDO $SED -n "/^$IP_ADDRESS[[:space:]]\+$DOMAIN.test\$/p" /etc/hosts >/dev/null; then
+    if $SUDO $GREP -q "^$IP_ADDRESS[[:space:]]\+$DOMAIN\.test\$" /etc/hosts; then
         echo "Entry already exists in /etc/hosts. Skipping..."
     else
         # Add .test domain entry to /etc/hosts file
@@ -254,6 +254,12 @@ elif [ "$1" == "remove-site" ]; then
     else
         remove_site $2
     fi
+elif [ "$1" == "update-hosts" ]; then
+    if [ -z "$2" ]; then
+        echo "Usage: $0 update-hosts domain_name"
+    else
+        update_hosts_file $2
+    fi
 else
-    echo "Usage: $0 [start|build-start|stop|destroy|add-site|remove-site] domain_name path"
+    echo "Usage: $0 [start|build-start|stop|destroy|add-site|remove-site|update-hosts] domain_name path"
 fi
